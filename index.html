@@ -245,25 +245,75 @@ function findRecipes(){
  let have=data.food.map(x=>x.toLowerCase());
 
  let recipes=T[lang].recipes;
- if(!premium){
-  recipes=recipes.slice(0,4);
- }
+ if(!premium) recipes=recipes.slice(0,4);
 
  let found=recipes.map(r=>({
   name:r[0],
   items:r[1],
   desc:r[2],
+  index:T[lang].recipes.indexOf(r),
   matched:r[1].filter(x=>have.some(h=>h.includes(x)||x.includes(h)))
  })).filter(r=>r.matched.length>0)
  .sort((a,b)=>b.matched.length-a.matched.length);
 
  el('recipeResults').innerHTML=found.length
-  ? found.map(r=>`<div class="recipe"><h3>${r.name}</h3><p>${r.desc}</p><span class="tag">${tr('hasAtHome')}${r.matched.join(', ')}</span><span class="tag">${tr('matches')}${r.matched.length}${tr('of')}${r.items.length}</span></div>`).join('')
+  ? found.map(r=>`
+   <div class="recipe">
+    <h3 onclick="showRecipeDetails(${r.index})" style="cursor:pointer;color:#3d8050;">
+     ${r.name} 👇
+    </h3>
+    <p>${r.desc}</p>
+    <span class="tag">${tr('hasAtHome')}${r.matched.join(', ')}</span>
+    <span class="tag">${tr('matches')}${r.matched.length}${tr('of')}${r.items.length}</span>
+    <div id="recipe-detail-${r.index}" style="display:none;margin-top:12px;"></div>
+   </div>`).join('')
   : `<p class="muted">${tr('noRecipes')}</p>`;
 
  if(!premium){
   el('recipeResults').innerHTML+=`<p class="muted">✨ ${lang==='ru'?'Ещё 3 рецепта доступны в Premium!':'3 more recipes are available in Premium!'}</p>`;
  }
+}
+ function showRecipeDetails(index){
+ const ru=[
+  {time:"25 минут",servings:"2 порции",ingredients:["Картофель — 2 шт. (200 г)","Морковь — 1 шт. (80 г)","Лук — ½ шт. (50 г)","Вода — 700 мл","Растительное масло — 1 ст. ложка","Соль — по вкусу"],steps:["Нарежь картофель кубиками.","Натри морковь и нарежь лук.","Обжарь лук и морковь 3–4 минуты.","Добавь картофель и воду.","Вари 15–20 минут до готовности. Добавь соль."]},
+  {time:"15 минут",servings:"2 порции",ingredients:["Яйца — 3 шт.","Помидор — 1 шт. (100 г)","Сыр — 40 г","Молоко — 2 ст. ложки","Масло — 1 ч. ложка","Соль — по вкусу"],steps:["Взбей яйца с молоком и солью.","Нарежь помидор.","Вылей яйца на разогретую сковороду.","Добавь помидор и тёртый сыр.","Готовь под крышкой 5–7 минут."]},
+  {time:"25 минут",servings:"2 порции",ingredients:["Рис — 150 г","Морковь — 1 шт.","Лук — ½ шт.","Вода — 300 мл","Масло — 1 ст. ложка","Соль — по вкусу"],steps:["Промой рис.","Нарежь лук и натри морковь.","Обжарь овощи 4–5 минут.","Добавь рис и воду.","Готовь под крышкой около 15 минут."]},
+  {time:"40 минут",servings:"2 порции",ingredients:["Картофель — 3 шт. (300 г)","Сыр — 80 г","Сметана — 2 ст. ложки","Масло — 1 ч. ложка","Соль — по вкусу"],steps:["Нарежь картофель тонкими ломтиками.","Смажь форму маслом.","Выложи картофель, добавь соль и сметану.","Посыпь тёртым сыром.","Запекай при 190 °C около 30 минут."]},
+  {time:"10 минут",servings:"2 порции",ingredients:["Помидоры — 2 шт. (200 г)","Огурец — 1 шт. (150 г)","Зелень — 10 г","Оливковое масло — 1 ст. ложка","Соль — по вкусу"],steps:["Нарежь помидоры и огурец.","Мелко нарежь зелень.","Смешай овощи.","Добавь масло и соль."]},
+  {time:"10 минут",servings:"1 порция",ingredients:["Овсянка — 50 г","Молоко — 200 мл","Банан — 1 шт.","Мёд — 1 ч. ложка (по желанию)"],steps:["Налей молоко в кастрюлю.","Добавь овсянку.","Вари 5–7 минут, помешивая.","Нарежь банан и добавь в готовую кашу.","По желанию добавь мёд."]},
+  {time:"20 минут",servings:"2 порции",ingredients:["Макароны — 150 г","Сыр — 80 г","Молоко — 100 мл","Сливочное масло — 15 г","Соль — по вкусу"],steps:["Отвари макароны до готовности.","Слей воду.","Добавь масло и молоко.","Добавь тёртый сыр.","Перемешай до расплавления сыра."]}
+ ];
+
+ const en=[
+  {time:"25 minutes",servings:"2 servings",ingredients:["Potatoes — 2 (200 g)","Carrot — 1 (80 g)","Onion — ½ (50 g)","Water — 700 ml","Vegetable oil — 1 tbsp","Salt to taste"],steps:["Dice the potatoes.","Grate the carrot and chop the onion.","Fry the onion and carrot for 3–4 minutes.","Add potatoes and water.","Cook for 15–20 minutes until tender. Add salt."]},
+  {time:"15 minutes",servings:"2 servings",ingredients:["Eggs — 3","Tomato — 1 (100 g)","Cheese — 40 g","Milk — 2 tbsp","Oil — 1 tsp","Salt to taste"],steps:["Beat eggs with milk and salt.","Chop the tomato.","Pour eggs into a heated pan.","Add tomato and grated cheese.","Cook covered for 5–7 minutes."]},
+  {time:"25 minutes",servings:"2 servings",ingredients:["Rice — 150 g","Carrot — 1","Onion — ½","Water — 300 ml","Oil — 1 tbsp","Salt to taste"],steps:["Rinse the rice.","Chop onion and grate carrot.","Fry vegetables for 4–5 minutes.","Add rice and water.","Cover and cook for about 15 minutes."]},
+  {time:"40 minutes",servings:"2 servings",ingredients:["Potatoes — 3 (300 g)","Cheese — 80 g","Sour cream — 2 tbsp","Oil — 1 tsp","Salt to taste"],steps:["Slice potatoes thinly.","Grease a baking dish.","Add potatoes, salt and sour cream.","Sprinkle with grated cheese.","Bake at 190 °C for about 30 minutes."]},
+  {time:"10 minutes",servings:"2 servings",ingredients:["Tomatoes — 2 (200 g)","Cucumber — 1 (150 g)","Fresh herbs — 10 g","Olive oil — 1 tbsp","Salt to taste"],steps:["Chop tomatoes and cucumber.","Chop the herbs.","Mix the vegetables.","Add oil and salt."]},
+  {time:"10 minutes",servings:"1 serving",ingredients:["Oats — 50 g","Milk — 200 ml","Banana — 1","Honey — 1 tsp (optional)"],steps:["Pour milk into a saucepan.","Add oats.","Cook for 5–7 minutes, stirring.","Slice the banana and add it.","Add honey if desired."]},
+  {time:"20 minutes",servings:"2 servings",ingredients:["Pasta — 150 g","Cheese — 80 g","Milk — 100 ml","Butter — 15 g","Salt to taste"],steps:["Cook the pasta until tender.","Drain the water.","Add butter and milk.","Add grated cheese.","Stir until the cheese melts."]}
+ ];
+
+ const box=el('recipe-detail-'+index);
+ if(!box)return;
+
+ if(box.style.display==='block'){
+  box.style.display='none';
+  return;
+ }
+
+ const r=(lang==='ru'?ru:en)[index];
+ if(!r)return;
+
+ box.innerHTML=`
+  <p><strong>${lang==='ru'?'Время приготовления: ':'Cooking time: '}</strong>${r.time}</p>
+  <p><strong>${lang==='ru'?'Количество: ':'Servings: '}</strong>${r.servings}</p>
+  <h4>${lang==='ru'?'🥕 Ингредиенты':'🥕 Ingredients'}</h4>
+  <ul>${r.ingredients.map(x=>`<li>${x}</li>`).join('')}</ul>
+  <h4>${lang==='ru'?'👩‍🍳 Приготовление':'👩‍🍳 Instructions'}</h4>
+  <ol>${r.steps.map(x=>`<li>${x}</li>`).join('')}</ol>
+ `;
+ box.style.display='block';
 }
 function addShopping(){let v=el('shopInput').value.trim();if(!v)return;data.shopping.push({name:v,done:false});el('shopInput').value='';save();renderShopping();}
 function renderShopping(){
