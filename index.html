@@ -221,14 +221,13 @@ function updatePremiumDemoButton(){
 
 function togglePremiumDemo(){
  const active=localStorage.getItem('what-today-premium-demo')==='yes';
-  const title=el('weekTitle');
- if(title){
-  title.textContent = active
-   ? (lang==='ru'?'План питания на 30 дней':'30-day meal plan')
-   : (lang==='ru'?'План питания на неделю':'Weekly meal plan');
+
+ if(active){
+  localStorage.removeItem('what-today-premium-demo');
+ }else{
+  localStorage.setItem('what-today-premium-demo','yes');
  }
- if(active){localStorage.removeItem('what-today-premium-demo');}
- else{localStorage.setItem('what-today-premium-demo','yes');}
+
  renderWeek();
 }
  function addFood(){let v=el('foodInput').value.trim();if(!v)return;data.food.push(v);el('foodInput').value='';save();renderFood();}
