@@ -1,20 +1,23 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Что сегодня? — планировщик питания</title>
- <link rel="icon" type="image/png" href="icon.png">
- <link rel="apple-touch-icon" sizes="180x180" href="https://hopevtorova14-dotcom.github.io/what-today-app/icon.png?v=2">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://hopevtorova14-dotcom.github.io/what-today-app/icon.png?v=2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <style>
 :root{--green:#527b5b;--light:#edf3e9;--cream:#faf8f1;--ink:#29372d;--muted:#788477;--orange:#e9a45d}
 *{box-sizing:border-box}
 body{margin:0;background:var(--cream);color:var(--ink);font-family:Arial,sans-serif}
-header{background:var(--green);color:white;padding:25px 20px 22px}
+header{background:var(--green);color:white;padding:22px 20px}
+.headerline{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:850px;margin:auto}
 header h1{margin:0;font-size:27px}
 header p{margin:8px 0 0;color:#e3eee1;font-size:14px}
+.lang{display:flex;gap:5px;flex-shrink:0}
+.lang button{border:1px solid #ffffff88;background:transparent;color:white;border-radius:8px;padding:8px 10px;font-weight:bold;cursor:pointer}
+.lang button.active{background:white;color:var(--green)}
 main{max-width:850px;margin:auto;padding:18px 14px 45px}
 nav{display:flex;gap:8px;overflow-x:auto;padding:5px 0 15px}
 nav button{white-space:nowrap;border:0;background:#e8eee4;color:var(--green);padding:11px 15px;border-radius:20px;font-weight:bold;cursor:pointer}
@@ -48,207 +51,154 @@ button.delete{background:#fff0ec;color:#b75a47}
 .day{background:#f6f8f3;padding:10px;border-radius:12px}
 .day input{font-size:13px;padding:8px;margin:5px 0}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+@media(max-width:480px){header{padding:18px 14px}.headerline{align-items:flex-start}header h1{font-size:23px}.lang button{padding:7px 8px}}
 </style>
 </head>
 <body>
 <header>
-<h1>🥑 Что сегодня?</h1>
-<p>Планируй питание, покупки и бюджет без лишней суеты</p>
+ <div class="headerline">
+  <div><h1 id="appTitle">🥑 Что сегодня?</h1><p id="tagline">Планируй питание, покупки и бюджет без лишней суеты</p></div>
+  <div class="lang"><button id="ruBtn" class="active" onclick="setLang('ru')">RU</button><button id="enBtn" onclick="setLang('en')">EN</button></div>
+ </div>
 </header>
 <main>
 <nav>
-<button class="active" data-tab="menu">🍽 Меню</button>
-<button data-tab="week">📅 Неделя</button>
-<button data-tab="home">🥕 Продукты</button>
-<button data-tab="recipes">👩‍🍳 Рецепты</button>
-<button data-tab="shopping">🛒 Покупки</button>
-<button data-tab="budget">💰 Бюджет</button>
+<button class="active" data-tab="menu" data-i18n="tabMenu">🍽 Меню</button>
+<button data-tab="week" data-i18n="tabWeek">📅 Неделя</button>
+<button data-tab="home" data-i18n="tabHome">🥕 Продукты</button>
+<button data-tab="recipes" data-i18n="tabRecipes">👩‍🍳 Рецепты</button>
+<button data-tab="shopping" data-i18n="tabShopping">🛒 Покупки</button>
+<button data-tab="budget" data-i18n="tabBudget">💰 Бюджет</button>
 </nav>
-
 <section id="menu" class="active">
-<div class="card">
-<h2>Моё меню на сегодня</h2>
-<p class="muted">Запиши, что планируешь приготовить сегодня.</p>
-<div class="meal"><h3>🌞 Завтрак</h3><input id="breakfast" placeholder="Например: овсянка с ягодами"></div>
-<div class="meal"><h3>☀️ Обед</h3><input id="lunch" placeholder="Например: суп и салат"></div>
-<div class="meal"><h3>🌙 Ужин</h3><input id="dinner" placeholder="Например: рыба с овощами"></div>
-<button class="primary" onclick="saveMenu()">Сохранить меню</button>
-<span id="menuMessage" class="muted"></span>
-</div>
-<div class="card">
-<h2>Маленький совет дня 🌿</h2>
-<p id="tip">Планирование даже одного приёма пищи помогает сделать день проще.</p>
-</div>
+ <div class="card">
+  <h2 data-i18n="todayMenu">Моё меню на сегодня</h2>
+  <p class="muted" data-i18n="menuHint">Запиши, что планируешь приготовить сегодня.</p>
+  <div class="meal"><h3 data-i18n="breakfast">🌞 Завтрак</h3><input id="breakfast" data-placeholder="breakfastPh" placeholder="Например: овсянка с ягодами"></div>
+  <div class="meal"><h3 data-i18n="lunch">☀️ Обед</h3><input id="lunch" data-placeholder="lunchPh" placeholder="Например: суп и салат"></div>
+  <div class="meal"><h3 data-i18n="dinner">🌙 Ужин</h3><input id="dinner" data-placeholder="dinnerPh" placeholder="Например: рыба с овощами"></div>
+  <button class="primary" onclick="saveMenu()" data-i18n="saveMenu">Сохранить меню</button>
+  <span id="menuMessage" class="muted"></span>
+ </div>
+ <div class="card"><h2 data-i18n="tipTitle">Маленький совет дня 🌿</h2><p id="tip">Планирование даже одного приёма пищи помогает сделать день проще.</p></div>
 </section>
-
-<section id="week">
-<div class="card">
-<h2>План питания на неделю</h2>
-<p class="muted">Заполни меню на каждый день. Изменения сохраняются автоматически.</p>
-<div class="weekgrid" id="weekGrid"></div>
-</div>
-</section>
-
-<section id="home">
-<div class="card">
-<h2>Что есть дома? 🥕</h2>
-<p class="muted">Добавляй продукты, которые уже есть в холодильнике и шкафах.</p>
-<div class="row">
-<input id="foodInput" placeholder="Например: картофель">
-<button class="primary" onclick="addFood()">Добавить</button>
-</div>
-<div id="foodList"></div>
-</div>
-</section>
-
-<section id="recipes">
-<div class="card">
-<h2>Что можно приготовить? 👩‍🍳</h2>
-<p class="muted">Подберём идеи из продуктов, которые есть дома.</p>
-<button class="primary" onclick="findRecipes()">Подобрать рецепты</button>
-<div id="recipeResults"></div>
-</div>
-</section>
-
-<section id="shopping">
-<div class="card">
-<h2>Список покупок 🛒</h2>
-<p class="muted">Добавляй всё, что нужно купить. Отмечай уже купленное.</p>
-<div class="row">
-<input id="shopInput" placeholder="Что нужно купить?">
-<button class="primary" onclick="addShopping()">Добавить</button>
-</div>
-<div id="shoppingList"></div>
-</div>
-</section>
-
-<section id="budget">
-<div class="card">
-<h2>Мой продуктовый бюджет 💰</h2>
-<label>Бюджет на месяц</label>
-<input id="budgetInput" type="number" min="0" placeholder="Например: 300">
-<label>Уже потрачено</label>
-<input id="spentInput" type="number" min="0" placeholder="Например: 75">
-<button class="primary" onclick="saveBudget()">Сохранить бюджет</button>
-<div id="budgetResult"></div>
-</div>
-</section>
-<footer>Что сегодня? · Твои планы остаются на твоём устройстве ❤️</footer>
+<section id="week"><div class="card"><h2 data-i18n="weekTitle">План питания на неделю</h2><p class="muted" data-i18n="weekHint">Заполни меню на каждый день. Изменения сохраняются автоматически.</p><div class="weekgrid" id="weekGrid"></div></div></section>
+<section id="home"><div class="card"><h2 data-i18n="homeTitle">Что есть дома? 🥕</h2><p class="muted" data-i18n="homeHint">Добавляй продукты, которые уже есть в холодильнике и шкафах.</p><div class="row"><input id="foodInput" data-placeholder="foodPh" placeholder="Например: картофель"><button class="primary" onclick="addFood()" data-i18n="add">Добавить</button></div><div id="foodList"></div></div></section>
+<section id="recipes"><div class="card"><h2 data-i18n="recipesTitle">Что можно приготовить? 👩‍🍳</h2><p class="muted" data-i18n="recipesHint">Подберём идеи из продуктов, которые есть дома.</p><button class="primary" onclick="findRecipes()" data-i18n="findRecipes">Подобрать рецепты</button><div id="recipeResults"></div></div></section>
+<section id="shopping"><div class="card"><h2 data-i18n="shoppingTitle">Список покупок 🛒</h2><p class="muted" data-i18n="shoppingHint">Добавляй всё, что нужно купить. Отмечай уже купленное.</p><div class="row"><input id="shopInput" data-placeholder="shopPh" placeholder="Что нужно купить?"><button class="primary" onclick="addShopping()" data-i18n="add">Добавить</button></div><div id="shoppingList"></div></div></section>
+<section id="budget"><div class="card"><h2 data-i18n="budgetTitle">Мой продуктовый бюджет 💰</h2><label data-i18n="monthlyBudget">Бюджет на месяц</label><input id="budgetInput" type="number" min="0" data-placeholder="budgetPh" placeholder="Например: 300"><label data-i18n="alreadySpent">Уже потрачено</label><input id="spentInput" type="number" min="0" data-placeholder="spentPh" placeholder="Например: 75"><button class="primary" onclick="saveBudget()" data-i18n="saveBudget">Сохранить бюджет</button><div id="budgetResult"></div></div></section>
+<footer id="footerText">Что сегодня? · Твои планы остаются на твоём устройстве ❤️</footer>
 </main>
-
 <script>
 const KEY='what-today-app-v1';
 let data;
 try{data=JSON.parse(localStorage.getItem(KEY))||{};}catch(e){data={};}
-data.food=data.food||[];
-data.shopping=data.shopping||[];
-data.week=data.week||{};
-data.menu=data.menu||{};
-data.budget=data.budget||{limit:'',spent:''};
-
+data.food=data.food||[];data.shopping=data.shopping||[];data.week=data.week||{};data.menu=data.menu||{};data.budget=data.budget||{limit:'',spent:''};
 function save(){localStorage.setItem(KEY,JSON.stringify(data));}
 function el(id){return document.getElementById(id);}
 function safe(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-
-document.querySelectorAll('nav button').forEach(b=>{
- b.addEventListener('click',()=>{
-  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
-  document.querySelectorAll('main section').forEach(x=>x.classList.remove('active'));
-  b.classList.add('active');
-  el(b.dataset.tab).classList.add('active');
- });
-});
-
-function loadMenu(){
- ['breakfast','lunch','dinner'].forEach(k=>el(k).value=data.menu[k]||'');
+const T={
+ru:{
+title:'🥑 Что сегодня?',tagline:'Планируй питание, покупки и бюджет без лишней суеты',
+tabMenu:'🍽 Меню',tabWeek:'📅 Неделя',tabHome:'🥕 Продукты',tabRecipes:'👩‍🍳 Рецепты',tabShopping:'🛒 Покупки',tabBudget:'💰 Бюджет',
+todayMenu:'Моё меню на сегодня',menuHint:'Запиши, что планируешь приготовить сегодня.',breakfast:'🌞 Завтрак',lunch:'☀️ Обед',dinner:'🌙 Ужин',
+breakfastPh:'Например: овсянка с ягодами',lunchPh:'Например: суп и салат',dinnerPh:'Например: рыба с овощами',saveMenu:'Сохранить меню',saved:' ✓ Сохранено!',
+tipTitle:'Маленький совет дня 🌿',tip:'Планирование даже одного приёма пищи помогает сделать день проще.',
+weekTitle:'План питания на неделю',weekHint:'Заполни меню на каждый день. Изменения сохраняются автоматически.',
+homeTitle:'Что есть дома? 🥕',homeHint:'Добавляй продукты, которые уже есть в холодильнике и шкафах.',foodPh:'Например: картофель',add:'Добавить',
+recipesTitle:'Что можно приготовить? 👩‍🍳',recipesHint:'Подберём идеи из продуктов, которые есть дома.',findRecipes:'Подобрать рецепты',
+shoppingTitle:'Список покупок 🛒',shoppingHint:'Добавляй всё, что нужно купить. Отмечай уже купленное.',shopPh:'Что нужно купить?',
+budgetTitle:'Мой продуктовый бюджет 💰',monthlyBudget:'Бюджет на месяц',alreadySpent:'Уже потрачено',budgetPh:'Например: 300',spentPh:'Например: 75',saveBudget:'Сохранить бюджет',
+footer:'Что сегодня? · Твои планы остаются на твоём устройстве ❤️',days:['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье'],
+meals:['Завтрак','Обед','Ужин'],remove:'Удалить',foodEmpty:'Пока список пуст. Добавь первый продукт.',shoppingEmpty:'Список покупок пока пуст.',
+hasAtHome:'Есть дома: ',matches:'Совпадений: ',of:' из ',noRecipes:'Пока не нашли совпадений. Добавь продукты в раздел «Продукты» или попробуй другие ингредиенты.',
+remaining:'Остаток: ',spent:'Потрачено ',over:'Бюджет превышен.',enterBudget:'Введи бюджет, чтобы увидеть остаток.',
+recipes:[
+['Овощной суп',['картофель','морковь','лук'],'Нарежь овощи, отвари до мягкости, добавь специи.'],
+['Омлет с овощами',['яйца','помидор','сыр'],'Взбей яйца, добавь овощи и приготовь на сковороде.'],
+['Рис с овощами',['рис','морковь','лук'],'Отвари рис, обжарь овощи и смешай.'],
+['Картофель с сыром',['картофель','сыр'],'Запеки нарезанный картофель с сыром до золотистой корочки.'],
+['Салат с помидорами',['помидор','огурец'],'Нарежь овощи, добавь зелень и заправку.'],
+['Банановая овсянка',['овсянка','банан','молоко'],'Свари овсянку на молоке и добавь нарезанный банан.'],
+['Макароны с сыром',['макароны','сыр'],'Отвари макароны и добавь тёртый сыр.']]
+},
+en:{
+title:'🥑 What Today?',tagline:'Plan meals, shopping and your budget with ease',
+tabMenu:'🍽 Menu',tabWeek:'📅 Week',tabHome:'🥕 My food',tabRecipes:'👩‍🍳 Recipes',tabShopping:'🛒 Shopping',tabBudget:'💰 Budget',
+todayMenu:'My menu for today',menuHint:'Write down what you plan to cook today.',breakfast:'🌞 Breakfast',lunch:'☀️ Lunch',dinner:'🌙 Dinner',
+breakfastPh:'e.g. oatmeal with berries',lunchPh:'e.g. soup and salad',dinnerPh:'e.g. fish with vegetables',saveMenu:'Save menu',saved:' ✓ Saved!',
+tipTitle:'A little tip for today 🌿',tip:'Planning even one meal can make your day easier.',
+weekTitle:'Weekly meal plan',weekHint:'Plan meals for each day. Changes are saved automatically.',
+homeTitle:'What food do I have? 🥕',homeHint:'Add the food you already have in your fridge and cupboards.',foodPh:'e.g. potatoes',add:'Add',
+recipesTitle:'What can I cook? 👩‍🍳',recipesHint:'Find ideas using the food you have at home.',findRecipes:'Find recipes',
+shoppingTitle:'Shopping list 🛒',shoppingHint:'Add everything you need to buy. Tick items when purchased.',shopPh:'What do you need to buy?',
+budgetTitle:'My food budget 💰',monthlyBudget:'Monthly budget',alreadySpent:'Already spent',budgetPh:'e.g. 300',spentPh:'e.g. 75',saveBudget:'Save budget',
+footer:'What Today? · Your plans stay on your device ❤️',days:['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
+meals:['Breakfast','Lunch','Dinner'],remove:'Delete',foodEmpty:'Your list is empty. Add your first item.',shoppingEmpty:'Your shopping list is empty.',
+hasAtHome:'At home: ',matches:'Matches: ',of:' of ',noRecipes:'No matches yet. Add food in “My food” or try different ingredients.',
+remaining:'Remaining: ',spent:'Spent ',over:'You are over budget.',enterBudget:'Enter your budget to see what remains.',
+recipes:[
+['Vegetable soup',['potato','carrot','onion'],'Chop the vegetables, boil until tender and add seasoning.'],
+['Vegetable omelette',['eggs','tomato','cheese'],'Beat the eggs, add vegetables and cook in a pan.'],
+['Rice with vegetables',['rice','carrot','onion'],'Cook the rice, sauté the vegetables and mix together.'],
+['Cheesy potatoes',['potato','cheese'],'Bake sliced potatoes with cheese until golden.'],
+['Tomato salad',['tomato','cucumber'],'Chop the vegetables and add herbs and dressing.'],
+['Banana oatmeal',['oatmeal','banana','milk'],'Cook oatmeal with milk and add sliced banana.'],
+['Macaroni and cheese',['pasta','cheese'],'Cook the pasta and stir in grated cheese.']]
 }
-function saveMenu(){
- ['breakfast','lunch','dinner'].forEach(k=>data.menu[k]=el(k).value);
- save();el('menuMessage').textContent=' ✓ Сохранено!';
+};
+let lang=localStorage.getItem('what-today-lang')||'ru';
+function tr(k){return T[lang][k]||T.ru[k]||k;}
+function setLang(next){
+ lang=next;localStorage.setItem('what-today-lang',lang);
+ document.documentElement.lang=lang;el('appTitle').textContent=tr('title');el('tagline').textContent=tr('tagline');
+ document.querySelectorAll('[data-i18n]').forEach(node=>node.textContent=tr(node.dataset.i18n));
+ document.querySelectorAll('[data-placeholder]').forEach(node=>node.placeholder=tr(node.dataset.placeholder));
+ el('tip').textContent=tr('tip');el('footerText').textContent=tr('footer');
+ el('ruBtn').classList.toggle('active',lang==='ru');el('enBtn').classList.toggle('active',lang==='en');
+ renderWeek();renderFood();renderShopping();showBudget();
+ if(el('recipeResults').innerHTML) findRecipes();
 }
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+ document.querySelectorAll('main section').forEach(x=>x.classList.remove('active'));
+ b.classList.add('active');el(b.dataset.tab).classList.add('active');
+}));
+function loadMenu(){['breakfast','lunch','dinner'].forEach(k=>el(k).value=data.menu[k]||'');}
+function saveMenu(){['breakfast','lunch','dinner'].forEach(k=>data.menu[k]=el(k).value);save();el('menuMessage').textContent=tr('saved');}
 loadMenu();
-
-const days=['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье'];
 function renderWeek(){
- el('weekGrid').innerHTML=days.map((d,i)=>{
-  let v=data.week[i]||['','',''];
-  return `<div class="day"><b>${d}</b>
-  <input placeholder="Завтрак" value="${safe(v[0])}" data-day="${i}" data-meal="0">
-  <input placeholder="Обед" value="${safe(v[1])}" data-day="${i}" data-meal="1">
-  <input placeholder="Ужин" value="${safe(v[2])}" data-day="${i}" data-meal="2"></div>`;
+ el('weekGrid').innerHTML=T[lang].days.map((d,i)=>{
+ let v=data.week[i]||['','',''];
+ return `<div class="day"><b>${d}</b>${T[lang].meals.map((m,j)=>`<input placeholder="${m}" value="${safe(v[j])}" data-day="${i}" data-meal="${j}">`).join('')}</div>`;
  }).join('');
  el('weekGrid').querySelectorAll('input').forEach(inp=>inp.addEventListener('input',()=>{
-  let i=inp.dataset.day,m=inp.dataset.meal;
-  data.week[i]=data.week[i]||['','',''];
-  data.week[i][m]=inp.value;save();
+ let i=inp.dataset.day,m=inp.dataset.meal;data.week[i]=data.week[i]||['','',''];data.week[i][m]=inp.value;save();
  }));
 }
-renderWeek();
-
-function addFood(){
- let v=el('foodInput').value.trim();if(!v)return;
- data.food.push(v);el('foodInput').value='';save();renderFood();
-}
+function addFood(){let v=el('foodInput').value.trim();if(!v)return;data.food.push(v);el('foodInput').value='';save();renderFood();}
 function renderFood(){
- el('foodList').innerHTML=data.food.length?data.food.map((v,i)=>
- `<div class="item"><span>🥕 ${safe(v)}</span><button class="small delete" onclick="removeFood(${i})">Удалить</button></div>`
- ).join(''):'<p class="muted">Пока список пуст. Добавь первый продукт.</p>';
+ el('foodList').innerHTML=data.food.length?data.food.map((v,i)=>`<div class="item"><span>🥕 ${safe(v)}</span><button class="small delete" onclick="removeFood(${i})">${tr('remove')}</button></div>`).join(''):`<p class="muted">${tr('foodEmpty')}</p>`;
 }
 function removeFood(i){data.food.splice(i,1);save();renderFood();}
-renderFood();
-
-const recipes=[
- {name:'Овощной суп',items:['картофель','морковь','лук'],desc:'Нарежь овощи, отвари до мягкости, добавь специи.'},
- {name:'Омлет с овощами',items:['яйца','помидор','сыр'],desc:'Взбей яйца, добавь овощи и приготовь на сковороде.'},
- {name:'Рис с овощами',items:['рис','морковь','лук'],desc:'Отвари рис, обжарь овощи и смешай.'},
- {name:'Картофель с сыром',items:['картофель','сыр'],desc:'Запеки нарезанный картофель с сыром до золотистой корочки.'},
- {name:'Салат с помидорами',items:['помидор','огурец'],desc:'Нарежь овощи, добавь зелень и заправку.'},
- {name:'Банановая овсянка',items:['овсянка','банан','молоко'],desc:'Свари овсянку на молоке и добавь нарезанный банан.'},
- {name:'Макароны с сыром',items:['макароны','сыр'],desc:'Отвари макароны и добавь тёртый сыр.'}
-];
 function findRecipes(){
  let have=data.food.map(x=>x.toLowerCase());
- let found=recipes.map(r=>({...r,matched:r.items.filter(x=>have.some(h=>h.includes(x)||x.includes(h)))}))
- .filter(r=>r.matched.length>0).sort((a,b)=>b.matched.length-a.matched.length);
- el('recipeResults').innerHTML=found.length?found.map(r=>
- `<div class="recipe"><h3>${r.name}</h3><p>${r.desc}</p><span class="tag">Есть дома: ${r.matched.join(', ')}</span><span class="tag">Совпадений: ${r.matched.length} из ${r.items.length}</span></div>`
- ).join(''):'<p class="muted">Пока не нашли совпадений. Добавь продукты в раздел «Продукты» или попробуй другие ингредиенты.</p>';
+ let found=T[lang].recipes.map(r=>({name:r[0],items:r[1],desc:r[2],matched:r[1].filter(x=>have.some(h=>h.includes(x)||x.includes(h)))})).filter(r=>r.matched.length>0).sort((a,b)=>b.matched.length-a.matched.length);
+ el('recipeResults').innerHTML=found.length?found.map(r=>`<div class="recipe"><h3>${r.name}</h3><p>${r.desc}</p><span class="tag">${tr('hasAtHome')}${r.matched.join(', ')}</span><span class="tag">${tr('matches')}${r.matched.length}${tr('of')}${r.items.length}</span></div>`).join(''):`<p class="muted">${tr('noRecipes')}</p>`;
 }
-
-function addShopping(){
- let v=el('shopInput').value.trim();if(!v)return;
- data.shopping.push({name:v,done:false});el('shopInput').value='';save();renderShopping();
-}
+function addShopping(){let v=el('shopInput').value.trim();if(!v)return;data.shopping.push({name:v,done:false});el('shopInput').value='';save();renderShopping();}
 function renderShopping(){
- el('shoppingList').innerHTML=data.shopping.length?data.shopping.map((v,i)=>
- `<div class="item"><label style="display:flex;align-items:center;gap:9px;margin:0;flex:1"><input type="checkbox" style="width:auto" ${v.done?'checked':''} onchange="toggleShopping(${i})"><span style="${v.done?'text-decoration:line-through;color:#999':''}">${safe(v.name)}</span></label><button class="small delete" onclick="removeShopping(${i})">Удалить</button></div>`
- ).join(''):'<p class="muted">Список покупок пока пуст.</p>';
+ el('shoppingList').innerHTML=data.shopping.length?data.shopping.map((v,i)=>`<div class="item"><label style="display:flex;align-items:center;gap:9px;margin:0;flex:1"><input type="checkbox" style="width:auto" ${v.done?'checked':''} onchange="toggleShopping(${i})"><span style="${v.done?'text-decoration:line-through;color:#999':''}">${safe(v.name)}</span></label><button class="small delete" onclick="removeShopping(${i})">${tr('remove')}</button></div>`).join(''):`<p class="muted">${tr('shoppingEmpty')}</p>`;
 }
 function toggleShopping(i){data.shopping[i].done=!data.shopping[i].done;save();renderShopping();}
 function removeShopping(i){data.shopping.splice(i,1);save();renderShopping();}
-renderShopping();
-
-function loadBudget(){
- el('budgetInput').value=data.budget.limit;
- el('spentInput').value=data.budget.spent;
- showBudget();
-}
-function saveBudget(){
- data.budget.limit=el('budgetInput').value;
- data.budget.spent=el('spentInput').value;
- save();showBudget();
-}
+function loadBudget(){el('budgetInput').value=data.budget.limit;el('spentInput').value=data.budget.spent;showBudget();}
+function saveBudget(){data.budget.limit=el('budgetInput').value;data.budget.spent=el('spentInput').value;save();showBudget();}
 function showBudget(){
- let limit=Number(data.budget.limit)||0,spent=Number(data.budget.spent)||0;
- let left=limit-spent,pct=limit?Math.min(100,spent/limit*100):0;
- el('budgetResult').innerHTML=limit?`
- <h3>Остаток: ${left.toFixed(2)}</h3>
- <div class="progress"><div style="width:${pct}%"></div></div>
- <p class="muted">Потрачено ${spent.toFixed(2)} из ${limit.toFixed(2)} (${pct.toFixed(0)}%)</p>
- ${left<0?'<p style="color:#b75a47">Бюджет превышен.</p>':''}
- `:'<p class="muted">Введи бюджет, чтобы увидеть остаток.</p>';
+ let limit=Number(data.budget.limit)||0,spent=Number(data.budget.spent)||0,left=limit-spent,pct=limit?Math.min(100,spent/limit*100):0;
+ el('budgetResult').innerHTML=limit?`<h3>${tr('remaining')}${left.toFixed(2)}</h3><div class="progress"><div style="width:${pct}%"></div></div><p class="muted">${tr('spent')}${spent.toFixed(2)} ${lang==='ru'?'из':'of'} ${limit.toFixed(2)} (${pct.toFixed(0)}%)</p>${left<0?`<p style="color:#b75a47">${tr('over')}</p>`:''}`:`<p class="muted">${tr('enterBudget')}</p>`;
 }
-loadBudget();
+renderWeek();renderFood();renderShopping();loadBudget();setLang(lang);
 </script>
 </body>
 </html>
