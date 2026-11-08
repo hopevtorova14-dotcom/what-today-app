@@ -90,7 +90,8 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
  </div>
  <div class="card"><h2 data-i18n="tipTitle">Маленький совет дня 🌿</h2><p id="tip">Планирование даже одного приёма пищи помогает сделать день проще.</p></div>
 </section>
-<section id="week"><div class="card"><h2 data-i18n="weekTitle">План питания на неделю</h2><p class="muted" data-i18n="weekHint">Заполни меню на каждый день. Изменения сохраняются автоматически.</p><div class="weekgrid" id="weekGrid"></div></div></section>
+<section id="week"><div class="card"><h2 data-i18n="weekTitle">План питания на неделю</h2><p class="muted" data-i18n="weekHint">Заполни меню на каждый день. Изменения сохраняются автоматически.</p>
+ <button id="premium-demo-btn" class="primary" onclick="togglePremiumDemo()" style="margin-bottom:15px;">✨ Попробовать Premium на 30 дней</button><div class="weekgrid" id="weekGrid"></div></div></section>
 <section id="home"><div class="card"><h2 data-i18n="homeTitle">Что есть дома? 🥕</h2><p class="muted" data-i18n="homeHint">Добавляй продукты, которые уже есть в холодильнике и шкафах.</p><div class="row"><input id="foodInput" data-placeholder="foodPh" placeholder="Например: картофель"><button class="primary" onclick="addFood()" data-i18n="add">Добавить</button></div><div id="foodList"></div></div></section>
 <section id="recipes"><div class="card"><h2 data-i18n="recipesTitle">Что можно приготовить? 👩‍🍳</h2><p class="muted" data-i18n="recipesHint">Подберём идеи из продуктов, которые есть дома.</p><button class="primary" onclick="findRecipes()" data-i18n="findRecipes">Подобрать рецепты</button><div id="recipeResults"></div></div></section>
 <section id="shopping"><div class="card"><h2 data-i18n="shoppingTitle">Список покупок 🛒</h2><p class="muted" data-i18n="shoppingHint">Добавляй всё, что нужно купить. Отмечай уже купленное.</p><div class="row"><input id="shopInput" data-placeholder="shopPh" placeholder="Что нужно купить?"><button class="primary" onclick="addShopping()" data-i18n="add">Добавить</button></div><div id="shoppingList"></div></div></section>
@@ -198,8 +199,24 @@ function renderWeek(){
   data.week[i][m]=inp.value;
   save();
  }));
+  updatePremiumDemoButton();
 }
-function addFood(){let v=el('foodInput').value.trim();if(!v)return;data.food.push(v);el('foodInput').value='';save();renderFood();}
+function updatePremiumDemoButton(){
+ const btn=el('premium-demo-btn');
+ if(!btn)return;
+ const active=localStorage.getItem('what-today-premium-demo')==='yes';
+ btn.textContent = active
+  ? (lang==='ru'?'Отключить демо Premium':'Turn off Premium demo')
+  : (lang==='ru'?'✨ Попробовать Premium на 30 дней':'✨ Try Premium for 30 days');
+}
+
+function togglePremiumDemo(){
+ const active=localStorage.getItem('what-today-premium-demo')==='yes';
+ if(active){localStorage.removeItem('what-today-premium-demo');}
+ else{localStorage.setItem('what-today-premium-demo','yes');}
+ renderWeek();
+}
+ function addFood(){let v=el('foodInput').value.trim();if(!v)return;data.food.push(v);el('foodInput').value='';save();renderFood();}
 function renderFood(){
  el('foodList').innerHTML=data.food.length?data.food.map((v,i)=>`<div class="item"><span>🥕 ${safe(v)}</span><button class="small delete" onclick="removeFood(${i})">${tr('remove')}</button></div>`).join(''):`<p class="muted">${tr('foodEmpty')}</p>`;
 }
