@@ -57,7 +57,7 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
 <body>
  <div id="premium-banner" style="max-width:900px;margin:16px auto;padding:18px;background:#eaf4e8;border-radius:16px;text-align:center;">
   <h2>✨ What Today Premium</h2>
-  <p>Unlock more meal plans, recipes and smart shopping tools.</p>
+  <p id="premium-description">Откройте больше планов питания, рецептов и удобных инструментов для покупок.</p>
   <p><strong id="premium-price">399 ₽ / месяц</strong></p>
   <button onclick="alert('Premium subscription coming soon!')" style="background:#3d8050;color:white;border:0;padding:12px 24px;border-radius:10px;font-size:16px;">
     Узнать о Premium
@@ -160,6 +160,7 @@ function tr(k){return T[lang][k]||T.ru[k]||k;}
 function setLang(next){
  lang=next;localStorage.setItem('what-today-lang',lang);
  document.getElementById('premium-price').textContent = lang === 'ru' ? '399 ₽ / месяц' : '$3.99 / month';
+document.getElementById('premium-description').textContent = lang === 'ru' ? 'Откройте больше планов питания, рецептов и удобных инструментов для покупок.' : 'Unlock more meal plans, recipes and smart shopping tools.';
  document.documentElement.lang=lang;el('appTitle').textContent=tr('title');el('tagline').textContent=tr('tagline');
  document.querySelectorAll('[data-i18n]').forEach(node=>node.textContent=tr(node.dataset.i18n));
  document.querySelectorAll('[data-placeholder]').forEach(node=>node.placeholder=tr(node.dataset.placeholder));
