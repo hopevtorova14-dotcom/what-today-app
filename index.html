@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Что сегодня? — планировщик питания</title>
+<style>
+:root{--green:#527b5b;--light:#edf3e9;--cream:#faf8f1;--ink:#29372d;--muted:#788477;--orange:#e9a45d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:Arial,sans-serif}
+header{background:var(--green);color:white;padding:25px 20px 22px}
+header h1{margin:0;font-size:27px}
+header p{margin:8px 0 0;color:#e3eee1;font-size:14px}
+main{max-width:850px;margin:auto;padding:18px 14px 45px}
+nav{display:flex;gap:8px;overflow-x:auto;padding:5px 0 15px}
+nav button{white-space:nowrap;border:0;background:#e8eee4;color:var(--green);padding:11px 15px;border-radius:20px;font-weight:bold;cursor:pointer}
+nav button.active{background:var(--green);color:white}
+section{display:none}
+section.active{display:block}
+.card{background:white;border-radius:17px;padding:18px;margin-bottom:14px;box-shadow:0 3px 15px #263b2610}
+h2{font-size:21px;margin:5px 0 15px}
+h3{font-size:16px;margin:8px 0}
+p{line-height:1.5}
+.muted{color:var(--muted);font-size:13px}
+label{display:block;font-size:13px;color:var(--muted);margin:12px 0 6px}
+input,textarea,select{width:100%;padding:12px;border:1px solid #dce4d9;border-radius:10px;font:inherit;background:#fff;color:var(--ink)}
+textarea{resize:vertical;min-height:65px}
+button.primary{background:var(--green);color:white;border:0;border-radius:10px;padding:12px 17px;font-weight:bold;cursor:pointer;margin-top:10px}
+button.small{border:0;background:var(--light);color:var(--green);border-radius:8px;padding:7px 10px;cursor:pointer}
+button.delete{background:#fff0ec;color:#b75a47}
+.row{display:flex;gap:8px;align-items:center}
+.row input{flex:1;min-width:0}
+.meal{padding:12px 0;border-bottom:1px solid #edf0eb}
+.meal:last-child{border:0}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #edf0eb}
+.item:last-child{border:0}
+.item span{overflow-wrap:anywhere}
+.tag{display:inline-block;background:var(--light);color:var(--green);padding:5px 9px;border-radius:20px;font-size:12px;margin:3px}
+.recipe{border:1px solid #e7ece4;border-radius:12px;padding:13px;margin:10px 0}
+.recipe p{font-size:13px;color:var(--muted);margin:7px 0}
+.progress{height:9px;background:#e8eee4;border-radius:20px;overflow:hidden;margin:10px 0}
+.progress div{height:100%;background:var(--green);width:0}
+.weekgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px}
+.day{background:#f6f8f3;padding:10px;border-radius:12px}
+.day input{font-size:13px;padding:8px;margin:5px 0}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+</style>
+</head>
+<body>
+<header>
+<h1>🥑 Что сегодня?</h1>
+<p>Планируй питание, покупки и бюджет без лишней суеты</p>
+</header>
+<main>
+<nav>
+<button class="active" data-tab="menu">🍽 Меню</button>
+<button data-tab="week">📅 Неделя</button>
+<button data-tab="home">🥕 Продукты</button>
+<button data-tab="recipes">👩‍🍳 Рецепты</button>
+<button data-tab="shopping">🛒 Покупки</button>
+<button data-tab="budget">💰 Бюджет</button>
+</nav>
+
+<section id="menu" class="active">
+<div class="card">
+<h2>Моё меню на сегодня</h2>
+<p class="muted">Запиши, что планируешь приготовить сегодня.</p>
+<div class="meal"><h3>🌞 Завтрак</h3><input id="breakfast" placeholder="Например: овсянка с ягодами"></div>
+<div class="meal"><h3>☀️ Обед</h3><input id="lunch" placeholder="Например: суп и салат"></div>
+<div class="meal"><h3>🌙 Ужин</h3><input id="dinner" placeholder="Например: рыба с овощами"></div>
+<button class="primary" onclick="saveMenu()">Сохранить меню</button>
+<span id="menuMessage" class="muted"></span>
+</div>
+<div class="card">
+<h2>Маленький совет дня 🌿</h2>
+<p id="tip">Планирование даже одного приёма пищи помогает сделать день проще.</p>
+</div>
+</section>
+
+<section id="week">
+<div class="card">
+<h2>План питания на неделю</h2>
+<p class="muted">Заполни меню на каждый день. Изменения сохраняются автоматически.</p>
+<div class="weekgrid" id="weekGrid"></div>
+</div>
+</section>
+
+<section id="home">
+<div class="card">
+<h2>Что есть дома? 🥕</h2>
+<p class="muted">Добавляй продукты, которые уже есть в холодильнике и шкафах.</p>
+<div class="row">
+<input id="foodInput" placeholder="Например: картофель">
+<button class="primary" onclick="addFood()">Добавить</button>
+</div>
+<div id="foodList"></div>
+</div>
+</section>
+
+<section id="recipes">
+<div class="card">
+<h2>Что можно приготовить? 👩‍🍳</h2>
+<p class="muted">Подберём идеи из продуктов, которые есть дома.</p>
+<button class="primary" onclick="findRecipes()">Подобрать рецепты</button>
+<div id="recipeResults"></div>
+</div>
+</section>
+
+<section id="shopping">
+<div class="card">
+<h2>Список покупок 🛒</h2>
+<p class="muted">Добавляй всё, что нужно купить. Отмечай уже купленное.</p>
+<div class="row">
+<input id="shopInput" placeholder="Что нужно купить?">
+<button class="primary" onclick="addShopping()">Добавить</button>
+</div>
+<div id="shoppingList"></div>
+</div>
+</section>
+
+<section id="budget">
+<div class="card">
+<h2>Мой продуктовый бюджет 💰</h2>
+<label>Бюджет на месяц</label>
+<input id="budgetInput" type="number" min="0" placeholder="Например: 300">
+<label>Уже потрачено</label>
+<input id="spentInput" type="number" min="0" placeholder="Например: 75">
+<button class="primary" onclick="saveBudget()">Сохранить бюджет</button>
+<div id="budgetResult"></div>
+</div>
+</section>
+<footer>Что сегодня? · Твои планы остаются на твоём устройстве ❤️</footer>
+</main>
+
+<script>
+const KEY='what-today-app-v1';
+let data;
+try{data=JSON.parse(localStorage.getItem(KEY))||{};}catch(e){data={};}
+data.food=data.food||[];
+data.shopping=data.shopping||[];
+data.week=data.week||{};
+data.menu=data.menu||{};
+data.budget=data.budget||{limit:'',spent:''};
+
+function save(){localStorage.setItem(KEY,JSON.stringify(data));}
+function el(id){return document.getElementById(id);}
+function safe(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+document.querySelectorAll('nav button').forEach(b=>{
+ b.addEventListener('click',()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('main section').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  el(b.dataset.tab).classList.add('active');
+ });
+});
+
+function loadMenu(){
+ ['breakfast','lunch','dinner'].forEach(k=>el(k).value=data.menu[k]||'');
+}
+function saveMenu(){
+ ['breakfast','lunch','dinner'].forEach(k=>data.menu[k]=el(k).value);
+ save();el('menuMessage').textContent=' ✓ Сохранено!';
+}
+loadMenu();
+
+const days=['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье'];
+function renderWeek(){
+ el('weekGrid').innerHTML=days.map((d,i)=>{
+  let v=data.week[i]||['','',''];
+  return `<div class="day"><b>${d}</b>
+  <input placeholder="Завтрак" value="${safe(v[0])}" data-day="${i}" data-meal="0">
+  <input placeholder="Обед" value="${safe(v[1])}" data-day="${i}" data-meal="1">
+  <input placeholder="Ужин" value="${safe(v[2])}" data-day="${i}" data-meal="2"></div>`;
+ }).join('');
+ el('weekGrid').querySelectorAll('input').forEach(inp=>inp.addEventListener('input',()=>{
+  let i=inp.dataset.day,m=inp.dataset.meal;
+  data.week[i]=data.week[i]||['','',''];
+  data.week[i][m]=inp.value;save();
+ }));
+}
+renderWeek();
+
+function addFood(){
+ let v=el('foodInput').value.trim();if(!v)return;
+ data.food.push(v);el('foodInput').value='';save();renderFood();
+}
+function renderFood(){
+ el('foodList').innerHTML=data.food.length?data.food.map((v,i)=>
+ `<div class="item"><span>🥕 ${safe(v)}</span><button class="small delete" onclick="removeFood(${i})">Удалить</button></div>`
+ ).join(''):'<p class="muted">Пока список пуст. Добавь первый продукт.</p>';
+}
+function removeFood(i){data.food.splice(i,1);save();renderFood();}
+renderFood();
+
+const recipes=[
+ {name:'Овощной суп',items:['картофель','морковь','лук'],desc:'Нарежь овощи, отвари до мягкости, добавь специи.'},
+ {name:'Омлет с овощами',items:['яйца','помидор','сыр'],desc:'Взбей яйца, добавь овощи и приготовь на сковороде.'},
+ {name:'Рис с овощами',items:['рис','морковь','лук'],desc:'Отвари рис, обжарь овощи и смешай.'},
+ {name:'Картофель с сыром',items:['картофель','сыр'],desc:'Запеки нарезанный картофель с сыром до золотистой корочки.'},
+ {name:'Салат с помидорами',items:['помидор','огурец'],desc:'Нарежь овощи, добавь зелень и заправку.'},
+ {name:'Банановая овсянка',items:['овсянка','банан','молоко'],desc:'Свари овсянку на молоке и добавь нарезанный банан.'},
+ {name:'Макароны с сыром',items:['макароны','сыр'],desc:'Отвари макароны и добавь тёртый сыр.'}
+];
+function findRecipes(){
+ let have=data.food.map(x=>x.toLowerCase());
+ let found=recipes.map(r=>({...r,matched:r.items.filter(x=>have.some(h=>h.includes(x)||x.includes(h)))}))
+ .filter(r=>r.matched.length>0).sort((a,b)=>b.matched.length-a.matched.length);
+ el('recipeResults').innerHTML=found.length?found.map(r=>
+ `<div class="recipe"><h3>${r.name}</h3><p>${r.desc}</p><span class="tag">Есть дома: ${r.matched.join(', ')}</span><span class="tag">Совпадений: ${r.matched.length} из ${r.items.length}</span></div>`
+ ).join(''):'<p class="muted">Пока не нашли совпадений. Добавь продукты в раздел «Продукты» или попробуй другие ингредиенты.</p>';
+}
+
+function addShopping(){
+ let v=el('shopInput').value.trim();if(!v)return;
+ data.shopping.push({name:v,done:false});el('shopInput').value='';save();renderShopping();
+}
+function renderShopping(){
+ el('shoppingList').innerHTML=data.shopping.length?data.shopping.map((v,i)=>
+ `<div class="item"><label style="display:flex;align-items:center;gap:9px;margin:0;flex:1"><input type="checkbox" style="width:auto" ${v.done?'checked':''} onchange="toggleShopping(${i})"><span style="${v.done?'text-decoration:line-through;color:#999':''}">${safe(v.name)}</span></label><button class="small delete" onclick="removeShopping(${i})">Удалить</button></div>`
+ ).join(''):'<p class="muted">Список покупок пока пуст.</p>';
+}
+function toggleShopping(i){data.shopping[i].done=!data.shopping[i].done;save();renderShopping();}
+function removeShopping(i){data.shopping.splice(i,1);save();renderShopping();}
+renderShopping();
+
+function loadBudget(){
+ el('budgetInput').value=data.budget.limit;
+ el('spentInput').value=data.budget.spent;
+ showBudget();
+}
+function saveBudget(){
+ data.budget.limit=el('budgetInput').value;
+ data.budget.spent=el('spentInput').value;
+ save();showBudget();
+}
+function showBudget(){
+ let limit=Number(data.budget.limit)||0,spent=Number(data.budget.spent)||0;
+ let left=limit-spent,pct=limit?Math.min(100,spent/limit*100):0;
+ el('budgetResult').innerHTML=limit?`
+ <h3>Остаток: ${left.toFixed(2)}</h3>
+ <div class="progress"><div style="width:${pct}%"></div></div>
+ <p class="muted">Потрачено ${spent.toFixed(2)} из ${limit.toFixed(2)} (${pct.toFixed(0)}%)</p>
+ ${left<0?'<p style="color:#b75a47">Бюджет превышен.</p>':''}
+ `:'<p class="muted">Введи бюджет, чтобы увидеть остаток.</p>';
+}
+loadBudget();
+</script>
+</body>
+</html>
