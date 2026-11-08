@@ -240,9 +240,29 @@ function renderFood(){
 }
 function removeFood(i){data.food.splice(i,1);save();renderFood();}
 function findRecipes(){
+ const premium=localStorage.getItem('what-today-premium-demo')==='yes';
  let have=data.food.map(x=>x.toLowerCase());
- let found=T[lang].recipes.map(r=>({name:r[0],items:r[1],desc:r[2],matched:r[1].filter(x=>have.some(h=>h.includes(x)||x.includes(h)))})).filter(r=>r.matched.length>0).sort((a,b)=>b.matched.length-a.matched.length);
- el('recipeResults').innerHTML=found.length?found.map(r=>`<div class="recipe"><h3>${r.name}</h3><p>${r.desc}</p><span class="tag">${tr('hasAtHome')}${r.matched.join(', ')}</span><span class="tag">${tr('matches')}${r.matched.length}${tr('of')}${r.items.length}</span></div>`).join(''):`<p class="muted">${tr('noRecipes')}</p>`;
+
+ let recipes=T[lang].recipes;
+ if(!premium){
+  recipes=recipes.slice(0,4);
+ }
+
+ let found=recipes.map(r=>({
+  name:r[0],
+  items:r[1],
+  desc:r[2],
+  matched:r[1].filter(x=>have.some(h=>h.includes(x)||x.includes(h)))
+ })).filter(r=>r.matched.length>0)
+ .sort((a,b)=>b.matched.length-a.matched.length);
+
+ el('recipeResults').innerHTML=found.length
+  ? found.map(r=>`<div class="recipe"><h3>${r.name}</h3><p>${r.desc}</p><span class="tag">${tr('hasAtHome')}${r.matched.join(', ')}</span><span class="tag">${tr('matches')}${r.matched.length}${tr('of')}${r.items.length}</span></div>`).join('')
+  : `<p class="muted">${tr('noRecipes')}</p>`;
+
+ if(!premium){
+  el('recipeResults').innerHTML+=`<p class="muted">✨ ${lang==='ru'?'Ещё 3 рецепта доступны в Premium!':'3 more recipes are available in Premium!'}</p>`;
+ }
 }
 function addShopping(){let v=el('shopInput').value.trim();if(!v)return;data.shopping.push({name:v,done:false});el('shopInput').value='';save();renderShopping();}
 function renderShopping(){
