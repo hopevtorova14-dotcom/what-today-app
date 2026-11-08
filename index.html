@@ -233,6 +233,7 @@ function togglePremiumDemo(){
  }
 
  renderWeek();
+ findRecipes();
 }
  function addFood(){let v=el('foodInput').value.trim();if(!v)return;data.food.push(v);el('foodInput').value='';save();renderFood();}
 function renderFood(){
