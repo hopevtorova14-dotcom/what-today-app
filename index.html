@@ -259,7 +259,7 @@ function findRecipes(){
  el('recipeResults').innerHTML=found.length
   ? found.map(r=>`
    <div class="recipe">
-    <h3 onclick="showRecipeDetails(${r.index})" style="cursor:pointer;color:#3d8050;">
+    <h3 onclick="showRecipeDetails(${r.index})" style="cursor:pointer;color:#3d8050;" title="Нажми, чтобы открыть рецепт">
      ${r.name} 👇
     </h3>
     <p>${r.desc}</p>
