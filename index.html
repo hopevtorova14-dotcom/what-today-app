@@ -178,12 +178,25 @@ function loadMenu(){['breakfast','lunch','dinner'].forEach(k=>el(k).value=data.m
 function saveMenu(){['breakfast','lunch','dinner'].forEach(k=>data.menu[k]=el(k).value);save();el('menuMessage').textContent=tr('saved');}
 loadMenu();
 function renderWeek(){
- el('weekGrid').innerHTML=T[lang].days.map((d,i)=>{
- let v=data.week[i]||['','',''];
- return `<div class="day"><b>${d}</b>${T[lang].meals.map((m,j)=>`<input placeholder="${m}" value="${safe(v[j])}" data-day="${i}" data-meal="${j}">`).join('')}</div>`;
+ const totalDays = localStorage.getItem('what-today-premium-demo') === 'yes' ? 30 : 7;
+ const start = new Date();
+
+ el('weekGrid').innerHTML = Array.from({length:totalDays},(_,i)=>{
+  const date = new Date(start);
+  date.setDate(start.getDate()+i);
+  const dayName = date.toLocaleDateString(lang==='ru'?'ru-RU':'en-US',{
+   weekday:'long',day:'numeric',month:'short'
+  });
+  let v=data.week[i]||['','',''];
+
+  return `<div class="day"><b>${dayName}</b>${T[lang].meals.map((m,j)=>`<input placeholder="${m}" value="${safe(v[j])}" data-day="${i}" data-meal="${j}">`).join('')}</div>`;
  }).join('');
+
  el('weekGrid').querySelectorAll('input').forEach(inp=>inp.addEventListener('input',()=>{
- let i=inp.dataset.day,m=inp.dataset.meal;data.week[i]=data.week[i]||['','',''];data.week[i][m]=inp.value;save();
+  let i=inp.dataset.day,m=inp.dataset.meal;
+  data.week[i]=data.week[i]||['','',''];
+  data.week[i][m]=inp.value;
+  save();
  }));
 }
 function addFood(){let v=el('foodInput').value.trim();if(!v)return;data.food.push(v);el('foodInput').value='';save();renderFood();}
