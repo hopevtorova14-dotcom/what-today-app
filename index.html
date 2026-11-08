@@ -203,11 +203,20 @@ function renderWeek(){
 }
 function updatePremiumDemoButton(){
  const btn=el('premium-demo-btn');
- if(!btn)return;
+ const title=el('weekTitle');
  const active=localStorage.getItem('what-today-premium-demo')==='yes';
- btn.textContent = active
-  ? (lang==='ru'?'Отключить демо Premium':'Turn off Premium demo')
-  : (lang==='ru'?'✨ Попробовать Premium на 30 дней':'✨ Try Premium for 30 days');
+
+ if(btn){
+  btn.textContent = active
+   ? (lang==='ru'?'Отключить демо Premium':'Turn off Premium demo')
+   : (lang==='ru'?'✨ Попробовать Premium на 30 дней':'✨ Try Premium for 30 days');
+ }
+
+ if(title){
+  title.textContent = active
+   ? (lang==='ru'?'План питания на 30 дней':'30-day meal plan')
+   : (lang==='ru'?'План питания на неделю':'Weekly meal plan');
+ }
 }
 
 function togglePremiumDemo(){
