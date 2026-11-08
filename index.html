@@ -167,7 +167,7 @@ document.getElementById('premium-description').textContent = lang === 'ru' ? 'О
  document.querySelectorAll('[data-placeholder]').forEach(node=>node.placeholder=tr(node.dataset.placeholder));
  el('tip').textContent=tr('tip');el('footerText').textContent=tr('footer');
  el('ruBtn').classList.toggle('active',lang==='ru');el('enBtn').classList.toggle('active',lang==='en');
- renderWeek();renderFood();renderShopping();showBudget();
+renderWeek();updatePremiumDemoButton();renderFood();renderShopping();showBudget();
  if(el('recipeResults').innerHTML) findRecipes();
 }
 document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{
