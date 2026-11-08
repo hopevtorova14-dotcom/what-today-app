@@ -163,7 +163,11 @@ function setLang(next){
  document.getElementById('premium-price').textContent = lang === 'ru' ? '399 ₽ / месяц' : '$3.99 / month';
 document.getElementById('premium-description').textContent = lang === 'ru' ? 'Откройте больше планов питания, рецептов и удобных инструментов для покупок.' : 'Unlock more meal plans, recipes and smart shopping tools.';
  document.documentElement.lang=lang;el('appTitle').textContent=tr('title');el('tagline').textContent=tr('tagline');
- document.querySelectorAll('[data-i18n]').forEach(node=>node.textContent=tr(node.dataset.i18n));
+ document.querySelectorAll('[data-i18n]').forEach(node=>{
+  if(node.dataset.i18n !== 'weekTitle'){
+   node.textContent=tr(node.dataset.i18n);
+  }
+});
  document.querySelectorAll('[data-placeholder]').forEach(node=>node.placeholder=tr(node.dataset.placeholder));
  el('tip').textContent=tr('tip');el('footerText').textContent=tr('footer');
  el('ruBtn').classList.toggle('active',lang==='ru');el('enBtn').classList.toggle('active',lang==='en');
