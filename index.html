@@ -243,7 +243,6 @@ function removeFood(i){data.food.splice(i,1);save();renderFood();}
 function findRecipes(){
  const premium=localStorage.getItem('what-today-premium-demo')==='yes';
  let have=data.food.map(x=>x.toLowerCase());
-
  let recipes=T[lang].recipes;
  if(!premium) recipes=recipes.slice(0,4);
 
@@ -259,10 +258,11 @@ function findRecipes(){
  el('recipeResults').innerHTML=found.length
   ? found.map(r=>`
    <div class="recipe">
-    <h3 onclick="showRecipeDetails(${r.index})" style="cursor:pointer;color:#3d8050;" title="Нажми, чтобы открыть рецепт">
-     ${r.name} 👇
-    </h3>
-    <p>${r.desc}</p>
+    <button type="button" class="recipe-open" data-index="${r.index}"
+     style="display:block;border:0;background:transparent;padding:0;color:#3d8050;font-size:18px;font-weight:bold;cursor:pointer;text-align:left;">
+     ${safe(r.name)} 👇
+    </button>
+    <p>${safe(r.desc)}</p>
     <span class="tag">${tr('hasAtHome')}${r.matched.join(', ')}</span>
     <span class="tag">${tr('matches')}${r.matched.length}${tr('of')}${r.items.length}</span>
     <div id="recipe-detail-${r.index}" style="display:none;margin-top:12px;"></div>
@@ -272,6 +272,12 @@ function findRecipes(){
  if(!premium){
   el('recipeResults').innerHTML+=`<p class="muted">✨ ${lang==='ru'?'Ещё 3 рецепта доступны в Premium!':'3 more recipes are available in Premium!'}</p>`;
  }
+
+ el('recipeResults').querySelectorAll('.recipe-open').forEach(button=>{
+  button.addEventListener('click',function(){
+   showRecipeDetails(Number(this.dataset.index));
+  });
+ });
 }
  function showRecipeDetails(index){
  const ru=[
